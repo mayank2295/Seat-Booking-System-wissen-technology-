@@ -27,6 +27,11 @@ router.get('/activity', apiController.activity);
 // Schedule info
 router.get('/schedule', apiController.schedule);
 
+// Leave management
+router.post('/leave/declare', apiController.declareLeave);
+router.post('/leave/cancel', apiController.cancelLeave);
+router.get('/leave/status', apiController.leaveStatus);
+
 // Server time
 router.get('/time', apiController.time);
 

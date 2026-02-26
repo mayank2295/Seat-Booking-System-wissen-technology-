@@ -156,6 +156,63 @@
 .info-card .card-value.green { color: var(--green); }
 .info-card .card-value.red { color: var(--red); }
 .info-card .card-value.orange { color: var(--orange); }
+.info-card .card-value.purple { color: #bf5af2; }
+
+/* ── Leave Banner ──────────────────────────────── */
+.leave-banner {
+  padding: 16px 24px;
+  border-radius: var(--radius);
+  margin-bottom: 16px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  font-size: .88rem;
+  font-weight: 500;
+}
+.leave-banner.on-leave {
+  background: rgba(191,90,242,.06);
+  border: 1px solid rgba(191,90,242,.2);
+  color: #8a3db8;
+}
+.leave-banner.not-on-leave {
+  background: rgba(99,99,102,.04);
+  border: 1px solid rgba(99,99,102,.12);
+  color: var(--text-sec);
+}
+.leave-banner-content {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+.leave-icon { font-size: 1.2rem; }
+.leave-action-btn {
+  padding: 8px 20px;
+  border-radius: 980px;
+  font-size: .82rem;
+  font-weight: 600;
+  transition: all .25s;
+  white-space: nowrap;
+}
+.leave-action-btn.declare {
+  background: #bf5af2;
+  color: #fff;
+}
+.leave-action-btn.declare:hover {
+  background: #a94ad9;
+  transform: scale(1.04);
+}
+.leave-action-btn.cancel {
+  background: transparent;
+  color: #bf5af2;
+  border: 1.5px solid rgba(191,90,242,.3);
+}
+.leave-action-btn.cancel:hover {
+  background: rgba(191,90,242,.06);
+  border-color: #bf5af2;
+}
+
+.stat-pill .dot.on-leave { background: #bf5af2; }
 
 /* ── Booking Banner ────────────────────────────────── */
 .booking-banner {

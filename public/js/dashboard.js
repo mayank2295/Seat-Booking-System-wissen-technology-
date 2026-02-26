@@ -63,6 +63,7 @@ const Dashboard = (() => {
     // Load seats & activity
     loadSeats();
     loadActivity();
+    loadLeaveStatus();
     connectSSE();
   }
 
@@ -95,6 +96,14 @@ const Dashboard = (() => {
       renderSeats(seats, user);
       updateStats(seats, user);
       updateBanner(seats, user);
+
+      // Update leave stats from server
+      if (data.stats) {
+        const onLeaveEl = document.getElementById('cardLeave');
+        const pillLeave = document.getElementById('pillLeave');
+        if (onLeaveEl) onLeaveEl.textContent = data.stats.onLeave || 0;
+        if (pillLeave) pillLeave.textContent = data.stats.onLeave || 0;
+      }
     } catch (err) {
       console.error('Failed to load seats:', err);
     }
@@ -148,6 +157,14 @@ const Dashboard = (() => {
 
     document.getElementById('cardAvailable').textContent = available;
     document.getElementById('cardBooked').textContent = booked;
+
+    // On Leave stat (from server stats)
+    const onLeaveEl = document.getElementById('cardLeave');
+    const pillLeave = document.getElementById('pillLeave');
+    // We'll update these after seats load via stats
+    if (onLeaveEl && seats._stats) {
+      onLeaveEl.textContent = seats._stats.onLeave || 0;
+    }
 
     document.getElementById('pillAvail').textContent = available;
     document.getElementById('pillBooked').textContent = booked;
@@ -259,6 +276,104 @@ const Dashboard = (() => {
     }
   }
 
+  /* ── Load Leave Status ───────────────────────── */
+  async function loadLeaveStatus() {
+    const user = Auth.getSession();
+    if (!user) return;
+
+    const banner = document.getElementById('leaveBanner');
+    const text = document.getElementById('leaveText');
+    const btn = document.getElementById('leaveActionBtn');
+
+    // Hide on weekends
+    if (isWeekend(selectedDate)) {
+      banner.style.display = 'none';
+      return;
+    }
+
+    try {
+      const res = await fetch(`${API}/api/leave/status?employeeId=${user.id}&date=${selectedDate}`);
+      const data = await res.json();
+
+      banner.style.display = 'flex';
+
+      // Remove old listeners by cloning
+      const newBtn = btn.cloneNode(true);
+      btn.replaceWith(newBtn);
+
+      if (data.onLeave) {
+        banner.className = 'leave-banner on-leave';
+        text.textContent = `You are on leave for ${selectedDate}`;
+        newBtn.textContent = 'Cancel Leave';
+        newBtn.className = 'leave-action-btn cancel';
+        newBtn.addEventListener('click', () => cancelLeave());
+      } else {
+        banner.className = 'leave-banner not-on-leave';
+        text.textContent = 'Going to be away? Declare leave to free your seat for others.';
+        newBtn.textContent = 'Declare Leave';
+        newBtn.className = 'leave-action-btn declare';
+        newBtn.addEventListener('click', () => declareLeave());
+      }
+    } catch (err) {
+      console.error('Failed to load leave status:', err);
+      banner.style.display = 'none';
+    }
+  }
+
+  /* ── Declare Leave ─────────────────────────── */
+  async function declareLeave() {
+    const user = Auth.getSession();
+    if (!user) return;
+
+    try {
+      const res = await fetch(`${API}/api/leave/declare`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ employeeId: user.id, date: selectedDate }),
+      });
+
+      const data = await res.json();
+      if (!res.ok) {
+        App.toast(data.error || 'Failed to declare leave', 'err');
+        return;
+      }
+
+      App.toast(data.message, 'ok');
+      loadSeats();
+      loadActivity();
+      loadLeaveStatus();
+    } catch (err) {
+      App.toast('Network error. Try again.', 'err');
+    }
+  }
+
+  /* ── Cancel Leave ──────────────────────────── */
+  async function cancelLeave() {
+    const user = Auth.getSession();
+    if (!user) return;
+
+    try {
+      const res = await fetch(`${API}/api/leave/cancel`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ employeeId: user.id, date: selectedDate }),
+      });
+
+      const data = await res.json();
+      if (!res.ok) {
+        App.toast(data.error || 'Failed to cancel leave', 'err');
+        return;
+      }
+
+      App.toast(data.message, 'info');
+      loadSeats();
+      loadActivity();
+      loadLeaveStatus();
+    } catch (err) {
+      App.toast('Network error. Try again.', 'err');
+    }
+  }
+
   /* ── SSE Connection ──────────────────────────────── */
   function connectSSE() {
     if (sseReconnectTimer) { clearTimeout(sseReconnectTimer); sseReconnectTimer = null; }
@@ -270,6 +385,12 @@ const Dashboard = (() => {
     sseSource.addEventListener('booking', () => {
       loadSeats();
       loadActivity();
+    });
+
+    sseSource.addEventListener('leave', () => {
+      loadSeats();
+      loadActivity();
+      loadLeaveStatus();
     });
 
     sseSource.onerror = () => {

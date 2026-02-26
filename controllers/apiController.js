@@ -113,12 +113,24 @@ const apiController = {
         bookedMap[b.seat_id] = b.user_id;
       });
 
+      // Get leaves for this date — each leave from priority batch frees a potential regular seat
+      const [leaves] = await pool.execute(
+        `SELECT l.user_id FROM leaves l
+         JOIN users u ON u.id = l.user_id
+         WHERE l.leave_date = ?`,
+        [date]
+      );
+
+      // Build set of cancelled seat IDs (released seats become temp floaters)
+      const cancelledSet = new Set(cancelled.map(c => c.seat_id));
+
       const seatList = seats.map((s) => ({
         id: s.seat_number,
         type: s.id <= REGULAR_SEATS ? 'regular' : 'floater',
         floor: s.id <= 20 ? 1 : 2,
         booked: !!bookedMap[s.id],
         bookedBy: bookedMap[s.id] || null,
+        tempFloater: cancelledSet.has(s.id),
       }));
 
       const weekNum = getWeekNumber(d);
@@ -154,6 +166,7 @@ const apiController = {
           availableFloaters: FLOATER_SEATS - bookedFloater + cancelled.length,
           releasedSeats: cancelled.length,
           totalBooked: bookings.length,
+          onLeave: leaves.length,
         },
       });
     } catch (err) {
@@ -191,6 +204,16 @@ const apiController = {
       const seatType = seat.id <= REGULAR_SEATS ? 'regular' : 'floater';
       const teamDay = isTeamDay(user.batch, bookDate);
 
+      // Check if this regular seat is a temp floater (freed by leave or release)
+      let isTempFloater = false;
+      if (seatType === 'regular') {
+        const [cancelledCheck] = await pool.execute(
+          `SELECT id FROM bookings WHERE seat_id = ? AND booking_date = ? AND status = 'cancelled'`,
+          [seat.id, date]
+        );
+        isTempFloater = cancelledCheck.length > 0;
+      }
+
       // One seat per employee per day
       const [existing] = await pool.execute(
         `SELECT id FROM bookings WHERE user_id = ? AND booking_date = ? AND status = 'booked'`,
@@ -198,6 +221,15 @@ const apiController = {
       );
       if (existing.length) {
         return res.status(400).json({ error: 'You already have a booking for this day.' });
+      }
+
+      // Cannot book if on leave
+      const [onLeave] = await pool.execute(
+        'SELECT id FROM leaves WHERE user_id = ? AND leave_date = ?',
+        [employeeId, date]
+      );
+      if (onLeave.length) {
+        return res.status(400).json({ error: 'You are on leave for this date. Cancel your leave first to book.' });
       }
 
       // Seat already taken
@@ -209,8 +241,8 @@ const apiController = {
         return res.status(400).json({ error: 'This seat is already booked by someone else.' });
       }
 
-      // Floater / non-team-day time restriction
-      if (seatType === 'floater' || !teamDay) {
+      // 3 PM cutoff: applies to permanent floaters always, and temp floaters on non-team days
+      if (seatType === 'floater' || (!teamDay && isTempFloater)) {
         const cutoff = new Date(bookDate);
         cutoff.setDate(cutoff.getDate() - 1);
         cutoff.setHours(15, 0, 0, 0);
@@ -221,8 +253,8 @@ const apiController = {
         }
       }
 
-      // Non-team day → floater only
-      if (!teamDay && seatType === 'regular') {
+      // Non-team day → can only book floater OR temp floater (freed by leave/release)
+      if (!teamDay && seatType === 'regular' && !isTempFloater) {
         return res.status(400).json({
           error: "It's not your team day. You can only book a floater seat.",
         });
@@ -377,6 +409,149 @@ const apiController = {
       weekNumber: getWeekNumber(d),
       serverTime: new Date().toISOString(),
     });
+  },
+
+  // ─── POST /api/leave/declare ───────────────────────────────────────────
+  async declareLeave(req, res) {
+    const { employeeId, date } = req.body;
+    if (!employeeId || !date) {
+      return res.status(400).json({ error: 'employeeId and date are required.' });
+    }
+
+    try {
+      const d = new Date(date + 'T00:00:00');
+
+      if (!isWeekday(d)) {
+        return res.status(400).json({ error: 'Cannot declare leave on weekends.' });
+      }
+
+      // Check if user exists
+      const [users] = await pool.execute('SELECT * FROM users WHERE id = ?', [employeeId]);
+      if (!users.length) return res.status(404).json({ error: 'Employee not found.' });
+      const user = users[0];
+
+      // Check if it's their team day
+      if (!isTeamDay(user.batch, d)) {
+        return res.status(400).json({ error: 'You can only declare leave on your team days.' });
+      }
+
+      // Check if already on leave
+      const [existingLeave] = await pool.execute(
+        'SELECT id FROM leaves WHERE user_id = ? AND leave_date = ?',
+        [employeeId, date]
+      );
+      if (existingLeave.length) {
+        return res.status(400).json({ error: 'You have already declared leave for this date.' });
+      }
+
+      // If user has an active booking, cancel it → seat becomes temp floater
+      const [booking] = await pool.execute(
+        `SELECT b.id, b.seat_id, s.seat_number
+         FROM bookings b JOIN seats s ON s.id = b.seat_id
+         WHERE b.user_id = ? AND b.booking_date = ? AND b.status = 'booked'`,
+        [employeeId, date]
+      );
+
+      if (booking.length) {
+        await pool.execute(
+          `UPDATE bookings SET status = 'cancelled' WHERE id = ?`,
+          [booking[0].id]
+        );
+
+        broadcastSSE('booking', {
+          action: 'released',
+          seatId: booking[0].seat_number,
+          employeeId,
+          date,
+          reason: 'leave',
+          timestamp: new Date().toISOString(),
+        });
+      }
+
+      // Insert leave record
+      await pool.execute(
+        'INSERT INTO leaves (user_id, leave_date) VALUES (?, ?)',
+        [employeeId, date]
+      );
+
+      broadcastSSE('leave', {
+        action: 'leave-declared',
+        employeeId,
+        date,
+        freedSeat: booking.length ? booking[0].seat_number : null,
+        timestamp: new Date().toISOString(),
+      });
+
+      res.json({
+        success: true,
+        message: booking.length
+          ? `Leave declared. Your seat ${booking[0].seat_number} is now available as a floater.`
+          : 'Leave declared successfully.',
+        freedSeat: booking.length ? booking[0].seat_number : null,
+      });
+    } catch (err) {
+      console.error('API leave declare error:', err);
+      res.status(500).json({ error: 'Server error.' });
+    }
+  },
+
+  // ─── POST /api/leave/cancel ────────────────────────────────────────────
+  async cancelLeave(req, res) {
+    const { employeeId, date } = req.body;
+    if (!employeeId || !date) {
+      return res.status(400).json({ error: 'employeeId and date are required.' });
+    }
+
+    try {
+      const [result] = await pool.execute(
+        'DELETE FROM leaves WHERE user_id = ? AND leave_date = ?',
+        [employeeId, date]
+      );
+
+      if (result.affectedRows === 0) {
+        return res.status(404).json({ error: 'No leave found to cancel.' });
+      }
+
+      broadcastSSE('leave', {
+        action: 'leave-cancelled',
+        employeeId,
+        date,
+        timestamp: new Date().toISOString(),
+      });
+
+      res.json({ success: true, message: 'Leave cancelled. You can now book a seat.' });
+    } catch (err) {
+      console.error('API leave cancel error:', err);
+      res.status(500).json({ error: 'Server error.' });
+    }
+  },
+
+  // ─── GET /api/leave/status?employeeId=X&date=YYYY-MM-DD ───────────────
+  async leaveStatus(req, res) {
+    const { employeeId, date } = req.query;
+    if (!employeeId || !date) {
+      return res.status(400).json({ error: 'employeeId and date are required.' });
+    }
+
+    try {
+      const [rows] = await pool.execute(
+        'SELECT id FROM leaves WHERE user_id = ? AND leave_date = ?',
+        [employeeId, date]
+      );
+
+      const [leaveCount] = await pool.execute(
+        'SELECT COUNT(*) AS count FROM leaves WHERE leave_date = ?',
+        [date]
+      );
+
+      res.json({
+        onLeave: rows.length > 0,
+        totalOnLeave: leaveCount[0].count,
+      });
+    } catch (err) {
+      console.error('API leave status error:', err);
+      res.status(500).json({ error: 'Server error.' });
+    }
   },
 
   // ─── GET /api/time ────────────────────────────────────────────────────

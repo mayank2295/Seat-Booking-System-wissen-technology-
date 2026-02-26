@@ -1,0 +1,541 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Seat Booking System — Technical Documentation</title>
+  <style>
+    @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap');
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body { font-family: 'Inter', 'Segoe UI', sans-serif; color: #1d1d1f; line-height: 1.7; background: #fff; padding: 60px 80px; max-width: 900px; margin: 0 auto; }
+    @media print { body { padding: 30px 40px; } }
+    h1 { font-size: 28px; font-weight: 700; text-align: center; margin-bottom: 4px; }
+    .subtitle { text-align: center; color: #6e6e73; font-size: 14px; margin-bottom: 8px; }
+    .author { text-align: center; color: #6e6e73; font-size: 13px; margin-bottom: 40px; }
+    h2 { font-size: 20px; font-weight: 700; margin-top: 36px; margin-bottom: 12px; padding-bottom: 6px; border-bottom: 2px solid #0071e3; color: #0071e3; }
+    h3 { font-size: 16px; font-weight: 600; margin-top: 20px; margin-bottom: 8px; color: #1d1d1f; }
+    p { font-size: 14px; margin-bottom: 10px; text-align: justify; }
+    ul, ol { font-size: 14px; margin: 8px 0 14px 24px; }
+    li { margin-bottom: 5px; }
+    code { background: #f5f5f7; padding: 2px 6px; border-radius: 4px; font-size: 13px; font-family: 'Consolas', monospace; }
+    pre { background: #f5f5f7; padding: 16px; border-radius: 8px; font-size: 13px; overflow-x: auto; margin: 10px 0 16px; font-family: 'Consolas', monospace; line-height: 1.5; }
+    table { width: 100%; border-collapse: collapse; margin: 12px 0 20px; font-size: 13px; }
+    th { background: #0071e3; color: #fff; padding: 10px 14px; text-align: left; font-weight: 600; }
+    td { padding: 9px 14px; border-bottom: 1px solid #e5e5e5; }
+    tr:nth-child(even) td { background: #fafafa; }
+    .diagram { background: #f5f5f7; border-radius: 8px; padding: 20px; margin: 14px 0 18px; font-family: 'Consolas', monospace; font-size: 13px; line-height: 1.6; text-align: center; }
+    .highlight { background: #fff3cd; padding: 12px 16px; border-left: 4px solid #ff9f0a; border-radius: 4px; margin: 12px 0; font-size: 13px; }
+    .page-break { page-break-after: always; }
+    hr { border: none; border-top: 1px solid #e5e5e5; margin: 30px 0; }
+  </style>
+</head>
+<body>
+
+<h1>Seat Booking System</h1>
+<p class="subtitle">Technical Documentation — Wissen Technology</p>
+<p class="author">Mayank Gupta &nbsp;|&nbsp; February 2026</p>
+
+<hr>
+
+<!-- TABLE OF CONTENTS -->
+<h2>Table of Contents</h2>
+<ol>
+  <li>Project Overview</li>
+  <li>Problem Statement</li>
+  <li>Solution Approach</li>
+  <li>System Architecture</li>
+  <li>Tech Stack</li>
+  <li>Database Design</li>
+  <li>Core Business Logic
+    <ul>
+      <li>7.1 Batch Rotation Algorithm</li>
+      <li>7.2 Seat Classification</li>
+      <li>7.3 Booking Validation Chain</li>
+      <li>7.4 Leave-to-Floater Conversion</li>
+      <li>7.5 3 PM Cutoff Rule</li>
+    </ul>
+  </li>
+  <li>Real-Time Updates (SSE)</li>
+  <li>Authentication & Security</li>
+  <li>API Endpoints</li>
+  <li>Frontend — SPA Architecture</li>
+  <li>Admin Panel</li>
+  <li>Project Structure</li>
+  <li>Setup & Deployment</li>
+  <li>Unique Selling Points (USPs)</li>
+</ol>
+
+<hr>
+
+<!-- 1. PROJECT OVERVIEW -->
+<h2>1. Project Overview</h2>
+<p>The Seat Booking System is a real-time web application designed for corporate environments where the number of employees exceeds the available office seats. It manages seat allocation fairly through an automated weekly batch rotation mechanism, live seat booking, leave management, and an admin panel.</p>
+
+<!-- 2. PROBLEM STATEMENT -->
+<h2>2. Problem Statement</h2>
+<p>An office has <strong>80 employees</strong> but only <strong>50 physical seats</strong>. Without a system:</p>
+<ul>
+  <li>Employees arrive to find no seats available</li>
+  <li>Manual coordination via emails/spreadsheets is error-prone</li>
+  <li>No visibility into who is coming or who is on leave</li>
+  <li>No fairness — same people occupy the best seats every day</li>
+  <li>When someone takes leave, their seat goes wasted for the entire day</li>
+</ul>
+
+<!-- 3. SOLUTION APPROACH -->
+<h2>3. Solution Approach</h2>
+<p>The system solves this through four key mechanisms:</p>
+<ol>
+  <li><strong>Weekly Batch Rotation:</strong> 80 employees are split into 2 batches of 40. Each batch gets priority access to regular seats on alternating days, rotating every week.</li>
+  <li><strong>Floater Seats:</strong> 10 seats (S-41 to S-50) are permanently open to everyone, allowing the non-priority batch to still come in when needed.</li>
+  <li><strong>Leave-to-Floater Conversion:</strong> When an employee declares leave, their booked seat is automatically released and becomes available as a temporary floater for others.</li>
+  <li><strong>Real-Time Dashboard:</strong> All bookings and releases are broadcast instantly to every connected user via Server-Sent Events (SSE).</li>
+</ol>
+
+<!-- 4. SYSTEM ARCHITECTURE -->
+<h2>4. System Architecture</h2>
+<div class="diagram">
+<pre style="text-align:left; background:transparent; padding:0;">
+┌─────────────────────┐         ┌─────────────────────┐         ┌───────────┐
+│   Browser (SPA)      │  JSON   │   Express Server     │  SQL    │  MySQL    │
+│   HTML / CSS / JS    │ ◄─────► │   (Node.js)          │ ◄─────► │  Database │
+│                      │  REST   │                      │         │           │
+│   - Landing Page     │         │   - API Controller   │         │  - users  │
+│   - Login Page       │         │   - Auth Middleware   │         │  - seats  │
+│   - Dashboard        │         │   - Leave Logic      │         │  - bookings│
+│                      │         │   - Batch Rotation   │         │  - leaves │
+└──────────┬───────────┘         └──────────┬───────────┘         └───────────┘
+           │                                │
+           └──── SSE (Server-Sent Events) ──┘
+                 (Real-time one-way push)
+</pre>
+</div>
+
+<p><strong>Three-tier architecture:</strong></p>
+<ul>
+  <li><strong>Presentation Layer:</strong> Single Page Application (SPA) served as static files — one HTML file with three views switching via JavaScript.</li>
+  <li><strong>Application Layer:</strong> Express.js server handling REST API endpoints, business logic, session management, and SSE broadcasting.</li>
+  <li><strong>Data Layer:</strong> MySQL relational database storing users, seats, bookings, and leaves with proper foreign keys and indexes.</li>
+</ul>
+
+<!-- 5. TECH STACK -->
+<h2>5. Tech Stack</h2>
+<table>
+  <tr><th>Layer</th><th>Technology</th><th>Purpose</th></tr>
+  <tr><td>Frontend</td><td>HTML5, CSS3, Vanilla JavaScript</td><td>SPA with no framework dependency</td></tr>
+  <tr><td>Backend</td><td>Node.js, Express.js</td><td>REST API server</td></tr>
+  <tr><td>Database</td><td>MySQL 8</td><td>Relational data storage</td></tr>
+  <tr><td>Authentication</td><td>bcrypt, express-session</td><td>Password hashing, session management</td></tr>
+  <tr><td>Session Store</td><td>express-mysql-session</td><td>Persistent sessions in MySQL</td></tr>
+  <tr><td>Real-time</td><td>Server-Sent Events (SSE)</td><td>Live updates without polling</td></tr>
+  <tr><td>Security</td><td>Helmet.js</td><td>HTTP security headers</td></tr>
+  <tr><td>Admin Panel</td><td>EJS Templates</td><td>Server-rendered admin pages</td></tr>
+</table>
+
+<!-- 6. DATABASE DESIGN -->
+<h2>6. Database Design</h2>
+
+<h3>Entity-Relationship Overview</h3>
+<div class="diagram">
+<pre style="text-align:left; background:transparent; padding:0;">
+  users (1) ──────┬──── (N) bookings (N) ────── (1) seats
+                  │
+                  └──── (N) leaves
+</pre>
+</div>
+
+<h3>Table: <code>users</code></h3>
+<table>
+  <tr><th>Column</th><th>Type</th><th>Description</th></tr>
+  <tr><td>id</td><td>INT (PK, AUTO_INCREMENT)</td><td>Unique employee ID</td></tr>
+  <tr><td>name</td><td>VARCHAR(100)</td><td>Employee name</td></tr>
+  <tr><td>email</td><td>VARCHAR(150) UNIQUE</td><td>Login email</td></tr>
+  <tr><td>password</td><td>VARCHAR(255)</td><td>bcrypt hash (never plain text)</td></tr>
+  <tr><td>batch</td><td>TINYINT</td><td>1 or 2 — determines rotation group</td></tr>
+  <tr><td>role</td><td>ENUM('admin','user')</td><td>Access level</td></tr>
+  <tr><td>created_at</td><td>TIMESTAMP</td><td>Registration time</td></tr>
+</table>
+
+<h3>Table: <code>seats</code></h3>
+<table>
+  <tr><th>Column</th><th>Type</th><th>Description</th></tr>
+  <tr><td>id</td><td>INT (PK)</td><td>1–40 = regular, 41–50 = floater</td></tr>
+  <tr><td>seat_number</td><td>VARCHAR(10) UNIQUE</td><td>Display label (S-01 to S-50)</td></tr>
+</table>
+
+<h3>Table: <code>bookings</code></h3>
+<table>
+  <tr><th>Column</th><th>Type</th><th>Description</th></tr>
+  <tr><td>id</td><td>INT (PK)</td><td>Booking ID</td></tr>
+  <tr><td>user_id</td><td>INT (FK → users)</td><td>Who booked</td></tr>
+  <tr><td>seat_id</td><td>INT (FK → seats)</td><td>Which seat</td></tr>
+  <tr><td>booking_date</td><td>DATE</td><td>For which date</td></tr>
+  <tr><td>status</td><td>ENUM('booked','cancelled')</td><td>Active or released</td></tr>
+  <tr><td>created_at</td><td>TIMESTAMP</td><td>Booking timestamp</td></tr>
+</table>
+<p><strong>Design Decision:</strong> Released seats are not deleted — status is set to <code>'cancelled'</code>. This preserves booking history for analytics and enables the temporary floater feature.</p>
+
+<h3>Table: <code>leaves</code></h3>
+<table>
+  <tr><th>Column</th><th>Type</th><th>Description</th></tr>
+  <tr><td>id</td><td>INT (PK)</td><td>Leave ID</td></tr>
+  <tr><td>user_id</td><td>INT (FK → users)</td><td>Who is on leave</td></tr>
+  <tr><td>leave_date</td><td>DATE</td><td>Leave date</td></tr>
+  <tr><td colspan="3"><strong>UNIQUE KEY</strong> on (user_id, leave_date) — prevents duplicate leave entries</td></tr>
+</table>
+
+<hr>
+
+<!-- 7. CORE BUSINESS LOGIC -->
+<h2>7. Core Business Logic</h2>
+
+<h3>7.1 Batch Rotation Algorithm</h3>
+<p>The rotation algorithm determines which batch has priority on any given date without any manual intervention:</p>
+
+<pre>
+// Reference date: a Monday that marks the start of Week 1
+const WEEK_REF_DATE = "2026-01-05";  // Set in .env
+
+function getWeekNumber(date) {
+    daysElapsed  = (date - referenceDate) / (24 * 60 * 60 * 1000)
+    weeksElapsed = floor(daysElapsed / 7)
+    weekParity   = weeksElapsed % 2    // 0 → Week 1, 1 → Week 2
+    return weekParity + 1              // Returns 1 or 2
+}
+</pre>
+
+<p><strong>Rotation Schedule:</strong></p>
+<table>
+  <tr><th>Week</th><th>Batch 1</th><th>Batch 2</th></tr>
+  <tr><td>Week 1 (odd)</td><td>Mon, Tue, Wed</td><td>Thu, Fri</td></tr>
+  <tr><td>Week 2 (even)</td><td>Thu, Fri</td><td>Mon, Tue, Wed</td></tr>
+</table>
+
+<p>The <code>isTeamDay(batch, date)</code> function checks if today is a "team day" for a given batch by matching the day of the week against the schedule for the current rotation week.</p>
+
+<h3>7.2 Seat Classification</h3>
+<p>All 50 seats are stored in one table. The type is determined by ID:</p>
+<ul>
+  <li><strong>Seats 1–40 (Regular):</strong> Only bookable by the priority batch on their assigned days.</li>
+  <li><strong>Seats 41–50 (Floater):</strong> Open to everyone, any day (subject to 3 PM cutoff for non-priority batch).</li>
+  <li><strong>Temporary Floaters:</strong> Regular seats released via cancellation or leave. These appear with a distinct orange color on the dashboard.</li>
+</ul>
+
+<pre>
+seatType = (seat.id <= 40) ? "regular" : "floater"
+tempFloater = (seat was cancelled/released for this date)
+</pre>
+
+<h3>7.3 Booking Validation Chain</h3>
+<p>Every booking request passes through <strong>7 sequential validations</strong>:</p>
+
+<pre>
+POST /api/book { employeeId, seatId, date }
+
+1. isWeekday(date)?          → No weekends allowed
+2. userExists(employeeId)?   → Must be valid employee
+3. seatExists(seatId)?       → Must be valid seat
+4. alreadyBooked(user,date)? → One seat per person per day
+5. onLeave(user, date)?      → Cannot book if on leave
+6. seatTaken(seat, date)?    → No double-booking same seat
+7. batchPermission?          →
+     If team day     → any seat allowed
+     If not team day → floater only + after 3PM cutoff
+</pre>
+
+<p>If <strong>any</strong> check fails, the booking is rejected with a specific error message. This chain prevents all edge cases including race conditions.</p>
+
+<h3>7.4 Leave-to-Floater Conversion</h3>
+<p>This is the key differentiating feature. When an employee declares leave:</p>
+
+<pre>
+DECLARE LEAVE (employeeId, date):
+   1. Validate: Is it a weekday?
+   2. Validate: Is it the user's team day?
+   3. Check: Does user have an active booking for this date?
+   4. If YES → Cancel booking (status = 'cancelled')
+              → The freed seat becomes a TEMPORARY FLOATER
+              → Broadcast SSE event to all connected clients
+   5. Insert leave record into leaves table
+   6. Return: "Leave declared. Seat S-XX now available as floater."
+</pre>
+
+<div class="highlight">
+  <strong>Key Insight:</strong> Without this feature, when a priority-batch member takes leave, their seat sits empty all day and no one else can use it. With this feature, the seat automatically becomes available to anyone — increasing seat utilization from ~80% to ~95%.
+</div>
+
+<p><strong>Floater count formula:</strong></p>
+<pre>
+Available Floaters = 10 (permanent) + released_seats + leave_freed_seats
+</pre>
+
+<h3>7.5 3 PM Cutoff Rule</h3>
+<p>Non-priority batch employees can only book floater seats after 3:00 PM the day before the booking date. This gives the priority batch the entire working day to make their bookings first.</p>
+
+<pre>
+cutoffTime = bookingDate - 1 day, 15:00:00
+if (currentTime < cutoffTime) → REJECT "Floaters available after 3 PM"
+</pre>
+
+<hr>
+
+<!-- 8. REAL-TIME UPDATES -->
+<h2>8. Real-Time Updates (SSE)</h2>
+
+<h3>Why Real-Time?</h3>
+<p>Without real-time updates, User A books seat S-05 but User B's screen still shows it as available. User B clicks it and gets an error. Poor user experience.</p>
+
+<h3>How SSE Works</h3>
+<pre>
+1. Browser opens: GET /api/stream (persistent HTTP connection)
+2. Server stores this connection in a Set: sseClients.add(res)
+3. Connection stays open indefinitely
+
+4. When ANY user books/releases/declares leave:
+   → Server calls broadcastSSE(event, data)
+   → Loops through ALL clients in the Set
+   → Sends the event to each connected browser
+
+5. Browser receives event → auto-refreshes seat grid + activity log
+
+6. If connection drops → browser auto-reconnects after 3 seconds
+7. On logout → connection is cleanly closed, reconnection flag disabled
+</pre>
+
+<h3>Why SSE over WebSocket?</h3>
+<table>
+  <tr><th>Factor</th><th>SSE</th><th>WebSocket</th></tr>
+  <tr><td>Direction</td><td>One-way (server → client)</td><td>Two-way</td></tr>
+  <tr><td>Complexity</td><td>Simple HTTP</td><td>Handshake protocol</td></tr>
+  <tr><td>Library needed</td><td>None (native browser API)</td><td>Usually needs socket.io</td></tr>
+  <tr><td>Auto-reconnect</td><td>Built-in</td><td>Must implement manually</td></tr>
+  <tr><td>Our need</td><td>✅ Sufficient</td><td>Overkill</td></tr>
+</table>
+
+<hr>
+
+<!-- 9. AUTHENTICATION & SECURITY -->
+<h2>9. Authentication & Security</h2>
+
+<h3>Password Handling</h3>
+<ul>
+  <li>Passwords are hashed using <strong>bcrypt</strong> with 10 salt rounds before storing in the database.</li>
+  <li>On login, <code>bcrypt.compare(input, storedHash)</code> verifies the password without ever decrypting it.</li>
+  <li>Even if the database is compromised, passwords cannot be reversed.</li>
+</ul>
+
+<h3>Dual Session Strategy</h3>
+<table>
+  <tr><th>Session Type</th><th>Storage</th><th>Used For</th></tr>
+  <tr><td>Server Session</td><td>MySQL (express-mysql-session)</td><td>Admin EJS pages, persists across server restarts</td></tr>
+  <tr><td>Client Session</td><td>Browser sessionStorage</td><td>SPA navigation, client-side state</td></tr>
+</table>
+
+<h3>Security Measures</h3>
+<ul>
+  <li><strong>Helmet.js:</strong> Sets HTTP security headers (XSS protection, content-type sniffing, etc.)</li>
+  <li><strong>CSRF Protection:</strong> Admin panel requires active server session.</li>
+  <li><strong>Role-based Access:</strong> Middleware checks <code>req.session.user.role === 'admin'</code> before allowing access to admin routes.</li>
+  <li><strong>Input Validation:</strong> All API endpoints validate required fields before processing.</li>
+</ul>
+
+<hr>
+
+<!-- 10. API ENDPOINTS -->
+<h2>10. API Endpoints</h2>
+<table>
+  <tr><th>Method</th><th>Endpoint</th><th>Description</th></tr>
+  <tr><td>POST</td><td>/api/login</td><td>Authenticate with email + password</td></tr>
+  <tr><td>POST</td><td>/api/logout</td><td>Destroy server session</td></tr>
+  <tr><td>GET</td><td>/api/seats?date=YYYY-MM-DD</td><td>All 50 seats with booking status for a date</td></tr>
+  <tr><td>POST</td><td>/api/book</td><td>Book a seat (7-step validation)</td></tr>
+  <tr><td>POST</td><td>/api/release</td><td>Release a booked seat → becomes temp floater</td></tr>
+  <tr><td>POST</td><td>/api/leave/declare</td><td>Declare leave → auto-releases booked seat</td></tr>
+  <tr><td>POST</td><td>/api/leave/cancel</td><td>Cancel leave → can book again</td></tr>
+  <tr><td>GET</td><td>/api/leave/status</td><td>Check if user is on leave for a date</td></tr>
+  <tr><td>GET</td><td>/api/my-bookings</td><td>User's booking history</td></tr>
+  <tr><td>GET</td><td>/api/activity</td><td>Recent booking/release activity log</td></tr>
+  <tr><td>GET</td><td>/api/schedule?date=</td><td>Batch schedule info for a date</td></tr>
+  <tr><td>GET</td><td>/api/time</td><td>Server time</td></tr>
+  <tr><td>GET</td><td>/api/stream</td><td>SSE real-time event stream</td></tr>
+</table>
+
+<hr>
+
+<!-- 11. FRONTEND -->
+<h2>11. Frontend — SPA Architecture</h2>
+
+<h3>Single Page Application Design</h3>
+<p>The entire user-facing application is a single <code>index.html</code> file with three views:</p>
+<ol>
+  <li><strong>Landing View:</strong> Hero section, feature cards, animated counters, call-to-action. Uses IntersectionObserver for scroll-reveal animations.</li>
+  <li><strong>Login View:</strong> Split-layout design with email/password form. Error feedback with animated banner.</li>
+  <li><strong>Dashboard View:</strong> Date picker, info cards (total/available/booked/batch/leave), booking banner, seat grids (regular + floater), legend, leave management, and real-time activity log.</li>
+</ol>
+
+<h3>View Switching Mechanism</h3>
+<pre>
+// Only one view is visible at a time via CSS class
+.view { display: none; }
+.view.active { display: block; animation: fadeIn; }
+
+// JavaScript toggles the 'active' class
+function navigate(viewName) {
+    allViews.forEach(v => v.classList.remove('active'));
+    targetView.classList.add('active');
+}
+</pre>
+
+<h3>Design System</h3>
+<ul>
+  <li>Apple-inspired minimal aesthetic with Inter font</li>
+  <li>CSS custom properties for consistent theming</li>
+  <li>Glass morphism effects on navigation</li>
+  <li>Smooth page transitions with overlay animation</li>
+  <li>Confetti animation on successful booking</li>
+  <li>Fully responsive — works on mobile, tablet, and desktop</li>
+</ul>
+
+<hr>
+
+<!-- 12. ADMIN PANEL -->
+<h2>12. Admin Panel</h2>
+<p>Separate server-rendered (EJS) interface accessible at <code>/admin</code> for administrators:</p>
+<ul>
+  <li>View all employees with batch assignments</li>
+  <li>Add and delete users</li>
+  <li>Monitor today's bookings and seat availability</li>
+  <li>View leave declarations</li>
+  <li>See rotation week number and batch schedules</li>
+  <li>Seat availability progress bar</li>
+</ul>
+
+<hr>
+
+<!-- 13. PROJECT STRUCTURE -->
+<h2>13. Project Structure</h2>
+<pre>
+seat-booking-system/
+├── app.js                        # Express config, middleware, routes
+├── server.js                     # Entry point (starts HTTP server)
+├── schema.sql                    # Database schema + seed data
+├── .env                          # Environment variables (not in git)
+├── .gitignore
+├── package.json
+│
+├── config/
+│   └── db.js                     # MySQL connection pool
+│
+├── controllers/
+│   ├── apiController.js          # All SPA API endpoints + SSE
+│   ├── adminController.js        # Admin panel logic
+│   ├── authController.js         # Legacy EJS auth
+│   ├── bookingController.js      # Legacy EJS bookings
+│   ├── dashboardController.js    # Legacy EJS dashboard
+│   └── leaveController.js        # Legacy EJS leave
+│
+├── models/
+│   ├── userModel.js              # User DB queries
+│   ├── seatModel.js              # Seat DB queries
+│   ├── bookingModel.js           # Booking DB queries
+│   └── leaveModel.js             # Leave DB queries
+│
+├── middleware/
+│   ├── authMiddleware.js         # isLoggedIn check
+│   └── adminMiddleware.js        # isAdmin check
+│
+├── routes/
+│   ├── apiRoutes.js              # /api/* route definitions
+│   ├── adminRoutes.js            # /admin/* route definitions
+│   ├── authRoutes.js             # Legacy auth routes
+│   ├── bookingRoutes.js          # Legacy booking routes
+│   ├── dashboardRoutes.js        # Legacy dashboard routes
+│   └── leaveRoutes.js            # Legacy leave routes
+│
+├── utils/
+│   └── weekHelper.js             # Batch rotation algorithm
+│
+├── public/                       # SPA Frontend (served as static)
+│   ├── index.html                # Main SPA file (3 views)
+│   ├── css/
+│   │   ├── base.css              # Variables, reset, view system
+│   │   ├── components.css        # Buttons, toast, confetti
+│   │   ├── landing.css           # Landing page styles
+│   │   ├── login.css             # Login page styles
+│   │   └── dashboard.css         # Dashboard styles
+│   └── js/
+│       ├── animations.js         # Scroll reveal, counters, confetti
+│       ├── auth.js               # Login/logout/session
+│       ├── dashboard.js          # Seats, booking, leave, SSE
+│       └── app.js                # SPA router, toast, init
+│
+└── views/                        # EJS Templates (admin panel)
+    ├── admin.ejs
+    ├── login.ejs
+    ├── dashboard.ejs
+    ├── error.ejs
+    └── partials/
+        ├── header.ejs
+        └── footer.ejs
+</pre>
+
+<hr>
+
+<!-- 14. SETUP -->
+<h2>14. Setup & Deployment</h2>
+<h3>Prerequisites</h3>
+<ul>
+  <li>Node.js v16 or higher</li>
+  <li>MySQL 8 or higher</li>
+</ul>
+
+<h3>Installation Steps</h3>
+<ol>
+  <li>Clone: <code>git clone https://github.com/mayank2295/Seat-Booking-System-wissen-technology-.git</code></li>
+  <li>Install: <code>npm install</code></li>
+  <li>Setup database: Run <code>schema.sql</code> in MySQL</li>
+  <li>Create <code>.env</code> file:
+    <pre>
+DB_HOST=localhost
+DB_USER=root
+DB_PASSWORD=your_password
+DB_NAME=seat_booking
+DB_PORT=3306
+SESSION_SECRET=your_secret_key
+TOTAL_SEATS=50
+WEEK_REF_DATE=2026-01-05
+PORT=3000</pre>
+  </li>
+  <li>Start: <code>npm start</code></li>
+  <li>Open: <code>http://localhost:3000</code></li>
+</ol>
+
+<h3>Default Admin Credentials</h3>
+<p>Email: <code>admin@company.com</code> &nbsp;|&nbsp; Password: <code>admin123</code></p>
+
+<hr>
+
+<!-- 15. USPs -->
+<h2>15. Unique Selling Points (USPs)</h2>
+
+<table>
+  <tr><th>#</th><th>Feature</th><th>Why It's Unique</th></tr>
+  <tr><td>1</td><td>Leave-to-Floater Conversion</td><td>Most systems just mark leave. Ours automatically frees the seat and makes it bookable by others — zero wasted seats.</td></tr>
+  <tr><td>2</td><td>SSE Real-Time Updates</td><td>No polling, no page refresh. Every user sees bookings/releases the instant they happen. Lightweight alternative to WebSocket.</td></tr>
+  <tr><td>3</td><td>Auto-Rotating Batch Algorithm</td><td>Pure math-based rotation using a reference date. No cron jobs, no manual week switching. Works forever without maintenance.</td></tr>
+  <tr><td>4</td><td>7-Step Booking Validation</td><td>Covers every edge case — weekends, double-booking, leave conflicts, batch permissions, time restrictions, seat availability.</td></tr>
+  <tr><td>5</td><td>Temporary Floater System</td><td>Released regular seats dynamically convert to floaters. The floater pool grows and shrinks based on real-time activity.</td></tr>
+  <tr><td>6</td><td>Zero-Framework Frontend</td><td>Pure HTML/CSS/JS SPA — no React, no Angular. Proves strong fundamentals. ~0 dependencies, instant load.</td></tr>
+  <tr><td>7</td><td>Dual Session Architecture</td><td>Server sessions for admin panel + client sessions for SPA. Both stay in sync through shared login/logout logic.</td></tr>
+  <tr><td>8</td><td>3 PM Fairness Cutoff</td><td>Non-priority batch can't grab floater seats until 3 PM the day before — ensures the priority batch gets first pick.</td></tr>
+  <tr><td>9</td><td>Booking History (Soft Delete)</td><td>Cancellations use status flag instead of DELETE. Full audit trail preserved for admin reporting.</td></tr>
+  <tr><td>10</td><td>Confetti + Polished UX</td><td>Apple-inspired design, glass morphism, animated counters, scroll reveals, booking confetti — production-level polish.</td></tr>
+</table>
+
+<hr>
+
+<p style="text-align:center; color:#6e6e73; font-size:12px; margin-top:40px;">
+  Seat Booking System — Wissen Technology &nbsp;|&nbsp; Mayank Gupta &nbsp;|&nbsp; 2026
+</p>
+
+</body>
+</html>
