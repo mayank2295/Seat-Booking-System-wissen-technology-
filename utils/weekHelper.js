@@ -1,53 +1,31 @@
 /**
  * Week/Batch business logic helper.
  *
- * Rotation schedule (repeats every 2 weeks):
- *   Week 1: Batch 1 → Mon, Tue, Wed  |  Batch 2 → Thu, Fri
- *   Week 2: Batch 1 → Thu, Fri       |  Batch 2 → Mon, Tue, Wed
- *
- * WEEK_REF_DATE in .env must be a Monday that counts as Week 1 start.
+ * FIXED schedule (same every week, no rotation):
+ *   Batch 1 → Mon, Tue, Wed
+ *   Batch 2 → Thu, Fri
  */
 
 // Day-of-week constants (JS getDay(): 0=Sun … 6=Sat)
 const MON = 1, TUE = 2, WED = 3, THU = 4, FRI = 5;
 
 /**
- * Get the rotation week number (1 or 2) for a given date.
+ * Get the week number — always returns 1 since schedule is fixed.
  */
 function getWeekNumber(date = new Date()) {
-  const ref = new Date(process.env.WEEK_REF_DATE || '2026-01-05');
-  ref.setHours(0, 0, 0, 0);
-
-  const target = new Date(date);
-  target.setHours(0, 0, 0, 0);
-
-  const diffMs = target - ref;
-  const diffDays = Math.floor(diffMs / (1000 * 60 * 60 * 24));
-  const weeksElapsed = Math.floor(diffDays / 7);
-
-  // Modulo 2 to alternate: 0 → Week 1, 1 → Week 2
-  const mod = ((weeksElapsed % 2) + 2) % 2; // handles negative values
-  return mod + 1; // returns 1 or 2
+  return 1;
 }
 
 /**
- * Get the active batch(es) for a given date.
- * Returns { batch1Days: [...], batch2Days: [...] } for the current rotation week.
+ * Get the fixed schedule.
+ * Batch 1 always works Mon, Tue, Wed.
+ * Batch 2 always works Thu, Fri.
  */
 function getSchedule(date = new Date()) {
-  const week = getWeekNumber(date);
-
-  if (week === 1) {
-    return {
-      batch1Days: [MON, TUE, WED],
-      batch2Days: [THU, FRI]
-    };
-  } else {
-    return {
-      batch1Days: [THU, FRI],
-      batch2Days: [MON, TUE, WED]
-    };
-  }
+  return {
+    batch1Days: [MON, TUE, WED],
+    batch2Days: [THU, FRI]
+  };
 }
 
 /**
@@ -55,12 +33,11 @@ function getSchedule(date = new Date()) {
  */
 function isTeamDay(batch, date = new Date()) {
   const dayOfWeek = date.getDay();
-  const schedule = getSchedule(date);
 
   if (batch === 1) {
-    return schedule.batch1Days.includes(dayOfWeek);
+    return [MON, TUE, WED].includes(dayOfWeek);
   } else if (batch === 2) {
-    return schedule.batch2Days.includes(dayOfWeek);
+    return [THU, FRI].includes(dayOfWeek);
   }
   return false;
 }
