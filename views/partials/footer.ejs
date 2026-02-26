@@ -1,0 +1,40 @@
+  </main>
+  <footer class="main-footer">
+    <p><i class="fas fa-chair"></i> &copy; <%= new Date().getFullYear() %> Seat Booking System &middot; All rights reserved</p>
+  </footer>
+
+  <script>
+    // Theme toggle
+    (function() {
+      const btn = document.getElementById('themeToggle');
+      const iconSpan = document.getElementById('themeIcon');
+      if (!btn) return;
+
+      function applyTheme(theme) {
+        document.documentElement.setAttribute('data-theme', theme);
+        localStorage.setItem('theme', theme);
+        iconSpan.innerHTML = theme === 'dark'
+          ? '<i class="fas fa-sun"></i>'
+          : '<i class="fas fa-moon"></i>';
+      }
+
+      applyTheme(localStorage.getItem('theme') || 'light');
+
+      btn.addEventListener('click', function() {
+        const current = document.documentElement.getAttribute('data-theme');
+        applyTheme(current === 'dark' ? 'light' : 'dark');
+      });
+    })();
+
+    // Auto-dismiss alerts after 5 seconds
+    document.querySelectorAll('.alert').forEach(function(el) {
+      setTimeout(function() {
+        el.style.transition = 'opacity 0.5s ease, transform 0.5s ease';
+        el.style.opacity = '0';
+        el.style.transform = 'translateY(-10px)';
+        setTimeout(function() { el.remove(); }, 500);
+      }, 5000);
+    });
+  </script>
+</body>
+</html>

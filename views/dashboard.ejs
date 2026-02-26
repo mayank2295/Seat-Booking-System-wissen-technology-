@@ -1,0 +1,158 @@
+<%- include('partials/header') %>
+
+<div class="dashboard-header">
+  <h1>Welcome, <%= user.name %></h1>
+  <p class="subtitle"><i class="fas fa-calendar-day"></i> Your workspace overview for today</p>
+  <span class="batch-badge"><i class="fas fa-users"></i> Batch <%= user.batch %></span>
+</div>
+
+<!-- Stats Grid with Icons -->
+<div class="stats-grid">
+  <div class="card stat-card">
+    <div class="stat-icon stat-icon-purple"><i class="fas fa-rotate"></i></div>
+    <div class="stat-label">Rotation Week</div>
+    <div class="stat-value">W<%= weekNumber %></div>
+  </div>
+  <div class="card stat-card">
+    <div class="stat-icon stat-icon-blue"><i class="fas fa-calendar-week"></i></div>
+    <div class="stat-label">Your Office Days</div>
+    <div class="stat-value stat-small"><%= batchSchedule %></div>
+  </div>
+  <div class="card stat-card">
+    <div class="stat-icon stat-icon-blue"><i class="fas fa-chair"></i></div>
+    <div class="stat-label">Total Seats</div>
+    <div class="stat-value"><%= totalSeats %></div>
+  </div>
+  <div class="card stat-card">
+    <div class="stat-icon stat-icon-yellow"><i class="fas fa-bookmark"></i></div>
+    <div class="stat-label">Booked</div>
+    <div class="stat-value"><%= bookedSeats %></div>
+  </div>
+  <div class="card stat-card">
+    <div class="stat-icon stat-icon-green"><i class="fas fa-check-circle"></i></div>
+    <div class="stat-label">Available</div>
+    <div class="stat-value text-success"><%= availableSeats %></div>
+  </div>
+  <div class="card stat-card">
+    <div class="stat-icon stat-icon-red"><i class="fas fa-plane-departure"></i></div>
+    <div class="stat-label">On Leave</div>
+    <div class="stat-value"><%= leaveCount %></div>
+  </div>
+</div>
+
+<!-- Seat Availability Progress Bar -->
+<div class="card">
+  <h2><i class="fas fa-chart-bar"></i> Seat Availability</h2>
+  <div class="progress-section">
+    <div class="progress-header">
+      <span><%= bookedSeats %> of <%= totalSeats %> seats booked</span>
+      <strong><%= availableSeats %> available</strong>
+    </div>
+    <div class="progress-bar">
+      <div class="progress-fill" style="width: <%= totalSeats > 0 ? Math.round((bookedSeats / totalSeats) * 100) : 0 %>%"></div>
+    </div>
+  </div>
+
+  <!-- Visual Seat Map -->
+  <div class="seat-grid">
+    <% for (let i = 1; i <= totalSeats; i++) { %>
+      <div class="seat-dot <%= i <= bookedSeats ? 'seat-dot-booked' : 'seat-dot-available' %>" title="S-<%= String(i).padStart(2, '0') %> — <%= i <= bookedSeats ? 'Booked' : 'Available' %>"></div>
+    <% } %>
+  </div>
+  <div class="seat-legend">
+    <span><span class="legend-dot legend-dot-available"></span> Available</span>
+    <span><span class="legend-dot legend-dot-booked"></span> Booked</span>
+  </div>
+</div>
+
+<!-- Two Column Layout: Status + Actions -->
+<div class="dashboard-grid">
+  <!-- Today's Status -->
+  <div class="card status-card">
+    <% if (!weekday) { %>
+      <div class="status-banner status-weekend">
+        <div class="status-icon"><i class="fas fa-umbrella-beach"></i></div>
+        <div class="status-content">
+          <h2>Weekend</h2>
+          <p>Booking is not available on weekends. Enjoy your time off!</p>
+        </div>
+      </div>
+    <% } else if (onLeave) { %>
+      <div class="status-banner status-leave">
+        <div class="status-icon"><i class="fas fa-plane"></i></div>
+        <div class="status-content">
+          <h2>On Leave Today</h2>
+          <p>Your seat is available for others. Cancel leave if plans change.</p>
+        </div>
+      </div>
+    <% } else if (teamDay) { %>
+      <div class="status-banner status-team">
+        <div class="status-icon"><i class="fas fa-building"></i></div>
+        <div class="status-content">
+          <h2>Your Team Day</h2>
+          <p>You can book a seat anytime. <strong><%= availableSeats %></strong> seats available right now.</p>
+        </div>
+      </div>
+    <% } else { %>
+      <div class="status-banner status-nonteam">
+        <div class="status-icon"><i class="fas fa-clock"></i></div>
+        <div class="status-content">
+          <h2>Not Your Assigned Day</h2>
+          <% if (currentHour >= 15) { %>
+            <p>Floating seats are open! <strong><%= availableSeats %></strong> seats available.</p>
+          <% } else { %>
+            <p>Floating booking opens at <strong>3:00 PM</strong>. Current time: <strong><%= currentHour %>:00</strong></p>
+          <% } %>
+        </div>
+      </div>
+    <% } %>
+  </div>
+
+  <!-- Action Card -->
+  <div class="card action-card">
+    <% if (onLeave) { %>
+      <h2><i class="fas fa-circle-info"></i> Leave Status</h2>
+      <p style="margin-bottom: 1.25rem; color: var(--text-secondary);">You have declared leave for today. Your seat has been freed.</p>
+      <form action="/leave/cancel" method="POST" class="inline-form">
+        <button type="submit" class="btn btn-primary"><i class="fas fa-rotate-left"></i> Cancel Leave &amp; Return</button>
+      </form>
+    <% } else if (userBooking) { %>
+      <h2><i class="fas fa-ticket"></i> Your Booking</h2>
+      <div class="booking-info">
+        <p><span class="text-muted">Seat</span> <strong><%= userBooking.seat_number %></strong></p>
+        <p><span class="text-muted">Date</span> <strong><%= userBooking.booking_date %></strong></p>
+      </div>
+      <form action="/booking/cancel" method="POST" class="inline-form">
+        <input type="hidden" name="bookingId" value="<%= userBooking.id %>">
+        <button type="submit" class="btn btn-danger" onclick="return confirm('Cancel this booking?')"><i class="fas fa-xmark"></i> Cancel Booking</button>
+      </form>
+    <% } else if (weekday) { %>
+      <h2><i class="fas fa-bolt"></i> Quick Actions</h2>
+      <% if (teamDay && availableSeats > 0) { %>
+        <div class="action-row">
+          <form action="/booking/book" method="POST" class="inline-form">
+            <button type="submit" class="btn btn-primary"><i class="fas fa-chair"></i> Book a Seat</button>
+          </form>
+          <form action="/leave/declare" method="POST" class="inline-form">
+            <button type="submit" class="btn btn-outline-dark" onclick="return confirm('Declare leave for today? Your seat will be freed.')"><i class="fas fa-plane-departure"></i> Take Leave</button>
+          </form>
+        </div>
+      <% } else if (teamDay && availableSeats === 0) { %>
+        <p class="text-muted mb-2"><i class="fas fa-circle-exclamation"></i> No seats available right now.</p>
+        <form action="/leave/declare" method="POST" class="inline-form">
+          <button type="submit" class="btn btn-outline-dark" onclick="return confirm('Declare leave for today?')"><i class="fas fa-plane-departure"></i> Take Leave</button>
+        </form>
+      <% } else if (!teamDay && floatingAllowed && availableSeats > 0) { %>
+        <form action="/booking/book" method="POST" class="inline-form">
+          <button type="submit" class="btn btn-primary"><i class="fas fa-chair"></i> Book Floating Seat</button>
+        </form>
+      <% } else if (!teamDay && floatingAllowed && availableSeats === 0) { %>
+        <p class="text-muted"><i class="fas fa-circle-exclamation"></i> No seats available right now.</p>
+      <% } else if (!teamDay && !floatingAllowed) { %>
+        <p class="text-muted"><i class="fas fa-hourglass-half"></i> Floating seat booking opens after <strong>3:00 PM</strong>.</p>
+      <% } %>
+    <% } %>
+  </div>
+</div>
+
+<%- include('partials/footer') %>

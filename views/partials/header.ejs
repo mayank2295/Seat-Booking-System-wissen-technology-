@@ -1,0 +1,42 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title><%= typeof title !== 'undefined' ? title + ' | ' : '' %>Seat Booking System</title>
+  <link rel="stylesheet" href="/css/style.css">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+  <script>
+    (function() {
+      const t = localStorage.getItem('theme') || 'light';
+      document.documentElement.setAttribute('data-theme', t);
+    })();
+  </script>
+</head>
+<body>
+  <header class="main-header">
+    <div class="header-inner">
+      <a href="/" class="logo">Seat Booking</a>
+      <nav class="header-nav">
+        <% if (typeof user !== 'undefined' && user) { %>
+          <% if (user.role === 'admin') { %>
+            <a href="/admin"><i class="fas fa-grid-2"></i> Admin</a>
+          <% } else { %>
+            <a href="/dashboard"><i class="fas fa-chart-pie"></i> Dashboard</a>
+          <% } %>
+          <span class="user-info"><i class="fas fa-user"></i> <%= user.name %></span>
+          <a href="/logout" class="btn btn-sm btn-outline"><i class="fas fa-right-from-bracket"></i> Logout</a>
+        <% } %>
+        <button class="theme-toggle" id="themeToggle" title="Toggle theme">
+          <span id="themeIcon"><i class="fas fa-moon"></i></span>
+        </button>
+      </nav>
+    </div>
+  </header>
+  <main class="container">
+    <% if (typeof success !== 'undefined' && success && success.length > 0) { %>
+      <div class="alert alert-success"><%= success[0] %></div>
+    <% } %>
+    <% if (typeof error !== 'undefined' && error && error.length > 0) { %>
+      <div class="alert alert-error"><%= error[0] %></div>
+    <% } %>

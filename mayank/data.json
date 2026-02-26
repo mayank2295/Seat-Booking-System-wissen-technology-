@@ -1,0 +1,780 @@
+{
+  "employees": [
+    {
+      "id": "EMP001",
+      "name": "Employee 1",
+      "batch": 1,
+      "email": "emp1@seatflow.io"
+    },
+    {
+      "id": "EMP002",
+      "name": "Employee 2",
+      "batch": 1,
+      "email": "emp2@seatflow.io"
+    },
+    {
+      "id": "EMP003",
+      "name": "Employee 3",
+      "batch": 1,
+      "email": "emp3@seatflow.io"
+    },
+    {
+      "id": "EMP004",
+      "name": "Employee 4",
+      "batch": 1,
+      "email": "emp4@seatflow.io"
+    },
+    {
+      "id": "EMP005",
+      "name": "Employee 5",
+      "batch": 1,
+      "email": "emp5@seatflow.io"
+    },
+    {
+      "id": "EMP006",
+      "name": "Employee 6",
+      "batch": 1,
+      "email": "emp6@seatflow.io"
+    },
+    {
+      "id": "EMP007",
+      "name": "Employee 7",
+      "batch": 1,
+      "email": "emp7@seatflow.io"
+    },
+    {
+      "id": "EMP008",
+      "name": "Employee 8",
+      "batch": 1,
+      "email": "emp8@seatflow.io"
+    },
+    {
+      "id": "EMP009",
+      "name": "Employee 9",
+      "batch": 1,
+      "email": "emp9@seatflow.io"
+    },
+    {
+      "id": "EMP010",
+      "name": "Employee 10",
+      "batch": 1,
+      "email": "emp10@seatflow.io"
+    },
+    {
+      "id": "EMP011",
+      "name": "Employee 11",
+      "batch": 1,
+      "email": "emp11@seatflow.io"
+    },
+    {
+      "id": "EMP012",
+      "name": "Employee 12",
+      "batch": 1,
+      "email": "emp12@seatflow.io"
+    },
+    {
+      "id": "EMP013",
+      "name": "Employee 13",
+      "batch": 1,
+      "email": "emp13@seatflow.io"
+    },
+    {
+      "id": "EMP014",
+      "name": "Employee 14",
+      "batch": 1,
+      "email": "emp14@seatflow.io"
+    },
+    {
+      "id": "EMP015",
+      "name": "Employee 15",
+      "batch": 1,
+      "email": "emp15@seatflow.io"
+    },
+    {
+      "id": "EMP016",
+      "name": "Employee 16",
+      "batch": 1,
+      "email": "emp16@seatflow.io"
+    },
+    {
+      "id": "EMP017",
+      "name": "Employee 17",
+      "batch": 1,
+      "email": "emp17@seatflow.io"
+    },
+    {
+      "id": "EMP018",
+      "name": "Employee 18",
+      "batch": 1,
+      "email": "emp18@seatflow.io"
+    },
+    {
+      "id": "EMP019",
+      "name": "Employee 19",
+      "batch": 1,
+      "email": "emp19@seatflow.io"
+    },
+    {
+      "id": "EMP020",
+      "name": "Employee 20",
+      "batch": 1,
+      "email": "emp20@seatflow.io"
+    },
+    {
+      "id": "EMP021",
+      "name": "Employee 21",
+      "batch": 1,
+      "email": "emp21@seatflow.io"
+    },
+    {
+      "id": "EMP022",
+      "name": "Employee 22",
+      "batch": 1,
+      "email": "emp22@seatflow.io"
+    },
+    {
+      "id": "EMP023",
+      "name": "Employee 23",
+      "batch": 1,
+      "email": "emp23@seatflow.io"
+    },
+    {
+      "id": "EMP024",
+      "name": "Employee 24",
+      "batch": 1,
+      "email": "emp24@seatflow.io"
+    },
+    {
+      "id": "EMP025",
+      "name": "Employee 25",
+      "batch": 1,
+      "email": "emp25@seatflow.io"
+    },
+    {
+      "id": "EMP026",
+      "name": "Employee 26",
+      "batch": 1,
+      "email": "emp26@seatflow.io"
+    },
+    {
+      "id": "EMP027",
+      "name": "Employee 27",
+      "batch": 1,
+      "email": "emp27@seatflow.io"
+    },
+    {
+      "id": "EMP028",
+      "name": "Employee 28",
+      "batch": 1,
+      "email": "emp28@seatflow.io"
+    },
+    {
+      "id": "EMP029",
+      "name": "Employee 29",
+      "batch": 1,
+      "email": "emp29@seatflow.io"
+    },
+    {
+      "id": "EMP030",
+      "name": "Employee 30",
+      "batch": 1,
+      "email": "emp30@seatflow.io"
+    },
+    {
+      "id": "EMP031",
+      "name": "Employee 31",
+      "batch": 1,
+      "email": "emp31@seatflow.io"
+    },
+    {
+      "id": "EMP032",
+      "name": "Employee 32",
+      "batch": 1,
+      "email": "emp32@seatflow.io"
+    },
+    {
+      "id": "EMP033",
+      "name": "Employee 33",
+      "batch": 1,
+      "email": "emp33@seatflow.io"
+    },
+    {
+      "id": "EMP034",
+      "name": "Employee 34",
+      "batch": 1,
+      "email": "emp34@seatflow.io"
+    },
+    {
+      "id": "EMP035",
+      "name": "Employee 35",
+      "batch": 1,
+      "email": "emp35@seatflow.io"
+    },
+    {
+      "id": "EMP036",
+      "name": "Employee 36",
+      "batch": 1,
+      "email": "emp36@seatflow.io"
+    },
+    {
+      "id": "EMP037",
+      "name": "Employee 37",
+      "batch": 1,
+      "email": "emp37@seatflow.io"
+    },
+    {
+      "id": "EMP038",
+      "name": "Employee 38",
+      "batch": 1,
+      "email": "emp38@seatflow.io"
+    },
+    {
+      "id": "EMP039",
+      "name": "Employee 39",
+      "batch": 1,
+      "email": "emp39@seatflow.io"
+    },
+    {
+      "id": "EMP040",
+      "name": "Employee 40",
+      "batch": 1,
+      "email": "emp40@seatflow.io"
+    },
+    {
+      "id": "EMP041",
+      "name": "Employee 41",
+      "batch": 2,
+      "email": "emp41@seatflow.io"
+    },
+    {
+      "id": "EMP042",
+      "name": "Employee 42",
+      "batch": 2,
+      "email": "emp42@seatflow.io"
+    },
+    {
+      "id": "EMP043",
+      "name": "Employee 43",
+      "batch": 2,
+      "email": "emp43@seatflow.io"
+    },
+    {
+      "id": "EMP044",
+      "name": "Employee 44",
+      "batch": 2,
+      "email": "emp44@seatflow.io"
+    },
+    {
+      "id": "EMP045",
+      "name": "Employee 45",
+      "batch": 2,
+      "email": "emp45@seatflow.io"
+    },
+    {
+      "id": "EMP046",
+      "name": "Employee 46",
+      "batch": 2,
+      "email": "emp46@seatflow.io"
+    },
+    {
+      "id": "EMP047",
+      "name": "Employee 47",
+      "batch": 2,
+      "email": "emp47@seatflow.io"
+    },
+    {
+      "id": "EMP048",
+      "name": "Employee 48",
+      "batch": 2,
+      "email": "emp48@seatflow.io"
+    },
+    {
+      "id": "EMP049",
+      "name": "Employee 49",
+      "batch": 2,
+      "email": "emp49@seatflow.io"
+    },
+    {
+      "id": "EMP050",
+      "name": "Employee 50",
+      "batch": 2,
+      "email": "emp50@seatflow.io"
+    },
+    {
+      "id": "EMP051",
+      "name": "Employee 51",
+      "batch": 2,
+      "email": "emp51@seatflow.io"
+    },
+    {
+      "id": "EMP052",
+      "name": "Employee 52",
+      "batch": 2,
+      "email": "emp52@seatflow.io"
+    },
+    {
+      "id": "EMP053",
+      "name": "Employee 53",
+      "batch": 2,
+      "email": "emp53@seatflow.io"
+    },
+    {
+      "id": "EMP054",
+      "name": "Employee 54",
+      "batch": 2,
+      "email": "emp54@seatflow.io"
+    },
+    {
+      "id": "EMP055",
+      "name": "Employee 55",
+      "batch": 2,
+      "email": "emp55@seatflow.io"
+    },
+    {
+      "id": "EMP056",
+      "name": "Employee 56",
+      "batch": 2,
+      "email": "emp56@seatflow.io"
+    },
+    {
+      "id": "EMP057",
+      "name": "Employee 57",
+      "batch": 2,
+      "email": "emp57@seatflow.io"
+    },
+    {
+      "id": "EMP058",
+      "name": "Employee 58",
+      "batch": 2,
+      "email": "emp58@seatflow.io"
+    },
+    {
+      "id": "EMP059",
+      "name": "Employee 59",
+      "batch": 2,
+      "email": "emp59@seatflow.io"
+    },
+    {
+      "id": "EMP060",
+      "name": "Employee 60",
+      "batch": 2,
+      "email": "emp60@seatflow.io"
+    },
+    {
+      "id": "EMP061",
+      "name": "Employee 61",
+      "batch": 2,
+      "email": "emp61@seatflow.io"
+    },
+    {
+      "id": "EMP062",
+      "name": "Employee 62",
+      "batch": 2,
+      "email": "emp62@seatflow.io"
+    },
+    {
+      "id": "EMP063",
+      "name": "Employee 63",
+      "batch": 2,
+      "email": "emp63@seatflow.io"
+    },
+    {
+      "id": "EMP064",
+      "name": "Employee 64",
+      "batch": 2,
+      "email": "emp64@seatflow.io"
+    },
+    {
+      "id": "EMP065",
+      "name": "Employee 65",
+      "batch": 2,
+      "email": "emp65@seatflow.io"
+    },
+    {
+      "id": "EMP066",
+      "name": "Employee 66",
+      "batch": 2,
+      "email": "emp66@seatflow.io"
+    },
+    {
+      "id": "EMP067",
+      "name": "Employee 67",
+      "batch": 2,
+      "email": "emp67@seatflow.io"
+    },
+    {
+      "id": "EMP068",
+      "name": "Employee 68",
+      "batch": 2,
+      "email": "emp68@seatflow.io"
+    },
+    {
+      "id": "EMP069",
+      "name": "Employee 69",
+      "batch": 2,
+      "email": "emp69@seatflow.io"
+    },
+    {
+      "id": "EMP070",
+      "name": "Employee 70",
+      "batch": 2,
+      "email": "emp70@seatflow.io"
+    },
+    {
+      "id": "EMP071",
+      "name": "Employee 71",
+      "batch": 2,
+      "email": "emp71@seatflow.io"
+    },
+    {
+      "id": "EMP072",
+      "name": "Employee 72",
+      "batch": 2,
+      "email": "emp72@seatflow.io"
+    },
+    {
+      "id": "EMP073",
+      "name": "Employee 73",
+      "batch": 2,
+      "email": "emp73@seatflow.io"
+    },
+    {
+      "id": "EMP074",
+      "name": "Employee 74",
+      "batch": 2,
+      "email": "emp74@seatflow.io"
+    },
+    {
+      "id": "EMP075",
+      "name": "Employee 75",
+      "batch": 2,
+      "email": "emp75@seatflow.io"
+    },
+    {
+      "id": "EMP076",
+      "name": "Employee 76",
+      "batch": 2,
+      "email": "emp76@seatflow.io"
+    },
+    {
+      "id": "EMP077",
+      "name": "Employee 77",
+      "batch": 2,
+      "email": "emp77@seatflow.io"
+    },
+    {
+      "id": "EMP078",
+      "name": "Employee 78",
+      "batch": 2,
+      "email": "emp78@seatflow.io"
+    },
+    {
+      "id": "EMP079",
+      "name": "Employee 79",
+      "batch": 2,
+      "email": "emp79@seatflow.io"
+    },
+    {
+      "id": "EMP080",
+      "name": "Employee 80",
+      "batch": 2,
+      "email": "emp80@seatflow.io"
+    }
+  ],
+  "seats": [
+    {
+      "id": "R01",
+      "type": "regular",
+      "floor": 1
+    },
+    {
+      "id": "R02",
+      "type": "regular",
+      "floor": 1
+    },
+    {
+      "id": "R03",
+      "type": "regular",
+      "floor": 1
+    },
+    {
+      "id": "R04",
+      "type": "regular",
+      "floor": 1
+    },
+    {
+      "id": "R05",
+      "type": "regular",
+      "floor": 1
+    },
+    {
+      "id": "R06",
+      "type": "regular",
+      "floor": 1
+    },
+    {
+      "id": "R07",
+      "type": "regular",
+      "floor": 1
+    },
+    {
+      "id": "R08",
+      "type": "regular",
+      "floor": 1
+    },
+    {
+      "id": "R09",
+      "type": "regular",
+      "floor": 1
+    },
+    {
+      "id": "R10",
+      "type": "regular",
+      "floor": 1
+    },
+    {
+      "id": "R11",
+      "type": "regular",
+      "floor": 1
+    },
+    {
+      "id": "R12",
+      "type": "regular",
+      "floor": 1
+    },
+    {
+      "id": "R13",
+      "type": "regular",
+      "floor": 1
+    },
+    {
+      "id": "R14",
+      "type": "regular",
+      "floor": 1
+    },
+    {
+      "id": "R15",
+      "type": "regular",
+      "floor": 1
+    },
+    {
+      "id": "R16",
+      "type": "regular",
+      "floor": 1
+    },
+    {
+      "id": "R17",
+      "type": "regular",
+      "floor": 1
+    },
+    {
+      "id": "R18",
+      "type": "regular",
+      "floor": 1
+    },
+    {
+      "id": "R19",
+      "type": "regular",
+      "floor": 1
+    },
+    {
+      "id": "R20",
+      "type": "regular",
+      "floor": 1
+    },
+    {
+      "id": "R21",
+      "type": "regular",
+      "floor": 2
+    },
+    {
+      "id": "R22",
+      "type": "regular",
+      "floor": 2
+    },
+    {
+      "id": "R23",
+      "type": "regular",
+      "floor": 2
+    },
+    {
+      "id": "R24",
+      "type": "regular",
+      "floor": 2
+    },
+    {
+      "id": "R25",
+      "type": "regular",
+      "floor": 2
+    },
+    {
+      "id": "R26",
+      "type": "regular",
+      "floor": 2
+    },
+    {
+      "id": "R27",
+      "type": "regular",
+      "floor": 2
+    },
+    {
+      "id": "R28",
+      "type": "regular",
+      "floor": 2
+    },
+    {
+      "id": "R29",
+      "type": "regular",
+      "floor": 2
+    },
+    {
+      "id": "R30",
+      "type": "regular",
+      "floor": 2
+    },
+    {
+      "id": "R31",
+      "type": "regular",
+      "floor": 2
+    },
+    {
+      "id": "R32",
+      "type": "regular",
+      "floor": 2
+    },
+    {
+      "id": "R33",
+      "type": "regular",
+      "floor": 2
+    },
+    {
+      "id": "R34",
+      "type": "regular",
+      "floor": 2
+    },
+    {
+      "id": "R35",
+      "type": "regular",
+      "floor": 2
+    },
+    {
+      "id": "R36",
+      "type": "regular",
+      "floor": 2
+    },
+    {
+      "id": "R37",
+      "type": "regular",
+      "floor": 2
+    },
+    {
+      "id": "R38",
+      "type": "regular",
+      "floor": 2
+    },
+    {
+      "id": "R39",
+      "type": "regular",
+      "floor": 2
+    },
+    {
+      "id": "R40",
+      "type": "regular",
+      "floor": 2
+    },
+    {
+      "id": "F01",
+      "type": "floater",
+      "floor": 1
+    },
+    {
+      "id": "F02",
+      "type": "floater",
+      "floor": 1
+    },
+    {
+      "id": "F03",
+      "type": "floater",
+      "floor": 1
+    },
+    {
+      "id": "F04",
+      "type": "floater",
+      "floor": 1
+    },
+    {
+      "id": "F05",
+      "type": "floater",
+      "floor": 1
+    },
+    {
+      "id": "F06",
+      "type": "floater",
+      "floor": 1
+    },
+    {
+      "id": "F07",
+      "type": "floater",
+      "floor": 1
+    },
+    {
+      "id": "F08",
+      "type": "floater",
+      "floor": 1
+    },
+    {
+      "id": "F09",
+      "type": "floater",
+      "floor": 1
+    },
+    {
+      "id": "F10",
+      "type": "floater",
+      "floor": 1
+    }
+  ],
+  "bookings": [
+    {
+      "id": "BK1772083770587",
+      "date": "2026-02-26",
+      "seatId": "F01",
+      "employeeId": "EMP001",
+      "type": "floater",
+      "status": "released",
+      "bookedAt": "2026-02-26T05:29:30.587Z",
+      "releasedAt": "2026-02-26T05:29:42.654Z"
+    },
+    {
+      "id": "BK1772086650502",
+      "date": "2026-02-26",
+      "seatId": "F01",
+      "employeeId": "EMP001",
+      "type": "floater",
+      "status": "booked",
+      "bookedAt": "2026-02-26T06:17:30.502Z"
+    }
+  ],
+  "activityLog": [
+    {
+      "action": "booked",
+      "employeeId": "EMP001",
+      "seatId": "F01",
+      "date": "2026-02-26",
+      "timestamp": "2026-02-26T06:17:30.504Z"
+    },
+    {
+      "action": "released",
+      "employeeId": "EMP001",
+      "seatId": "F01",
+      "date": "2026-02-26",
+      "timestamp": "2026-02-26T05:29:42.654Z"
+    },
+    {
+      "action": "booked",
+      "employeeId": "EMP001",
+      "seatId": "F01",
+      "date": "2026-02-26",
+      "timestamp": "2026-02-26T05:29:30.588Z"
+    }
+  ]
+}

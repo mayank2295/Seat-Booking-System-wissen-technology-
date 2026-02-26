@@ -1,0 +1,311 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>SeatFlow — Smart Seat Booking</title>
+
+  <!-- Google Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet" />
+
+  <!-- Component CSS -->
+  <link rel="stylesheet" href="css/base.css" />
+  <link rel="stylesheet" href="css/components.css" />
+  <link rel="stylesheet" href="css/landing.css" />
+  <link rel="stylesheet" href="css/login.css" />
+  <link rel="stylesheet" href="css/dashboard.css" />
+</head>
+<body>
+
+  <!-- ═══════════ PAGE TRANSITION OVERLAY ═══════════ -->
+  <div class="page-transition" id="pageTransition"></div>
+
+  <!-- ═══════════ TOAST ═══════════ -->
+  <div class="toast" id="toast"></div>
+
+  <!-- ═══════════ CONFETTI ═══════════ -->
+  <canvas id="confettiCanvas"></canvas>
+
+  <!-- ═══════════════════════════════════════════════════
+       VIEW 1 — LANDING
+       ═══════════════════════════════════════════════════ -->
+  <div id="viewLanding" class="view active">
+
+    <!-- Nav -->
+    <nav class="landing-nav" id="landingNav">
+      <div class="nav-brand">Seat<span>Flow</span></div>
+      <div class="nav-links">
+        <a href="#features">Features</a>
+        <a href="#numbers">Numbers</a>
+        <a href="#cta">Get Started</a>
+        <a href="#" class="nav-login-btn" id="navLoginBtn">Sign In</a>
+      </div>
+    </nav>
+
+    <!-- Hero -->
+    <section class="hero">
+      <div class="hero-badge fade-in">
+        <span class="dot"></span> Now Live — Book Your Seat
+      </div>
+      <h1 class="fade-in">
+        Your Workspace,<br /><span class="highlight">Perfectly Planned.</span>
+      </h1>
+      <p class="hero-sub fade-in">
+        80 employees, 50 seats, zero chaos. Real-time booking with smart
+        batch rotation and instant availability updates.
+      </p>
+      <div class="hero-buttons fade-in">
+        <button class="btn-hero btn-fill" id="heroGetStarted">
+          Get Started <span>→</span>
+        </button>
+        <button class="btn-hero btn-outline" onclick="document.getElementById('features').scrollIntoView({behavior:'smooth'})">
+          Learn More
+        </button>
+      </div>
+    </section>
+
+    <!-- Marquee -->
+    <div class="marquee-wrap">
+      <div class="marquee-track">
+        <span class="marquee-item"><span class="ico">⚡</span> Real-time Updates</span>
+        <span class="marquee-item"><span class="ico">🔄</span> Weekly Rotation</span>
+        <span class="marquee-item"><span class="ico">🪑</span> 50 Smart Seats</span>
+        <span class="marquee-item"><span class="ico">👥</span> 80 Employees</span>
+        <span class="marquee-item"><span class="ico">📊</span> Live Dashboard</span>
+        <span class="marquee-item"><span class="ico">🔒</span> Secure Booking</span>
+        <span class="marquee-item"><span class="ico">🌟</span> Floater Seats</span>
+        <span class="marquee-item"><span class="ico">📱</span> Mobile Ready</span>
+        <!-- duplicate for seamless loop -->
+        <span class="marquee-item"><span class="ico">⚡</span> Real-time Updates</span>
+        <span class="marquee-item"><span class="ico">🔄</span> Weekly Rotation</span>
+        <span class="marquee-item"><span class="ico">🪑</span> 50 Smart Seats</span>
+        <span class="marquee-item"><span class="ico">👥</span> 80 Employees</span>
+        <span class="marquee-item"><span class="ico">📊</span> Live Dashboard</span>
+        <span class="marquee-item"><span class="ico">🔒</span> Secure Booking</span>
+        <span class="marquee-item"><span class="ico">🌟</span> Floater Seats</span>
+        <span class="marquee-item"><span class="ico">📱</span> Mobile Ready</span>
+      </div>
+    </div>
+
+    <!-- Features -->
+    <section class="features" id="features">
+      <p class="section-label fade-in">Why SeatFlow</p>
+      <h2 class="section-title fade-in">Designed for the modern&nbsp;office.</h2>
+      <div class="features-grid stagger">
+        <div class="feature-card">
+          <div class="icon-wrap">🔄</div>
+          <h3>Smart Rotation</h3>
+          <p>Two batches of 40 rotate weekly. Your team gets priority seats on your assigned week — fairness built&nbsp;in.</p>
+        </div>
+        <div class="feature-card">
+          <div class="icon-wrap">⚡</div>
+          <h3>Real-time Sync</h3>
+          <p>Server-Sent Events push updates instantly. See bookings and releases the moment they&nbsp;happen.</p>
+        </div>
+        <div class="feature-card">
+          <div class="icon-wrap">🪑</div>
+          <h3>Floater Seats</h3>
+          <p>10 flexible seats open to everyone. Released seats become temporary floaters — maximum&nbsp;efficiency.</p>
+        </div>
+      </div>
+    </section>
+
+    <!-- Numbers -->
+    <section class="numbers" id="numbers">
+      <p class="section-label fade-in">By the Numbers</p>
+      <h2 class="section-title fade-in">Built for scale, designed for&nbsp;simplicity.</h2>
+      <div class="numbers-grid fade-in">
+        <div class="number-item">
+          <span class="number-big" data-count="80">0</span>
+          <span class="number-label">Employees</span>
+        </div>
+        <div class="number-item">
+          <span class="number-big" data-count="50">0</span>
+          <span class="number-label">Smart Seats</span>
+        </div>
+        <div class="number-item">
+          <span class="number-big" data-count="10">0</span>
+          <span class="number-label">Floater Seats</span>
+        </div>
+        <div class="number-item">
+          <span class="number-big" data-count="2">0</span>
+          <span class="number-label">Weekly Batches</span>
+        </div>
+      </div>
+    </section>
+
+    <!-- CTA -->
+    <section class="cta-banner" id="cta">
+      <div class="cta-card fade-in">
+        <h2>Ready to claim your&nbsp;seat?</h2>
+        <p>Sign in and book in seconds. It's that simple.</p>
+        <button class="btn-hero btn-fill" id="ctaGetStarted">
+          Sign In Now <span>→</span>
+        </button>
+      </div>
+    </section>
+
+    <!-- Footer -->
+    <footer class="landing-footer">
+      © 2025 SeatFlow — Crafted for modern workspaces.
+    </footer>
+  </div>
+
+  <!-- ═══════════════════════════════════════════════════
+       VIEW 2 — LOGIN
+       ═══════════════════════════════════════════════════ -->
+  <div id="viewLogin" class="view">
+    <div class="login-page">
+      <!-- Left panel -->
+      <div class="login-left">
+        <div class="login-shapes">
+          <div class="shape s1"></div>
+          <div class="shape s2"></div>
+          <div class="shape s3"></div>
+        </div>
+        <h2>Welcome Back</h2>
+        <p>Your seat is waiting.</p>
+      </div>
+
+      <!-- Right panel -->
+      <div class="login-right">
+        <div class="login-box">
+          <div class="back-link" id="backToLanding">← Back to Home</div>
+
+          <h2>Sign in</h2>
+          <p class="login-subtitle">Enter your employee credentials below.</p>
+
+          <form id="loginForm" autocomplete="off">
+            <div class="form-group">
+              <label for="empId">Employee ID</label>
+              <input type="text" id="empId" placeholder="e.g. EMP001" required />
+            </div>
+            <div class="form-group">
+              <label for="empPass">Password</label>
+              <input type="password" id="empPass" placeholder="Enter password" required />
+            </div>
+            <button type="submit" class="login-btn" id="loginBtn">Sign In</button>
+          </form>
+
+          <div class="login-error" id="loginError"></div>
+
+          <div class="login-hint">
+            <p><strong>Hint:</strong> Use <code>EMP001</code>–<code>EMP080</code> with password <code>pass1</code>–<code>pass80</code>, or universal password <code>seatflow2026</code></p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ═══════════════════════════════════════════════════
+       VIEW 3 — DASHBOARD
+       ═══════════════════════════════════════════════════ -->
+  <div id="viewDashboard" class="view">
+
+    <!-- Dashboard Nav -->
+    <nav class="dash-nav">
+      <div class="nav-brand">Seat<span>Flow</span></div>
+      <div class="dash-user">
+        <div class="dash-user-info">
+          <div class="dash-user-name" id="dashUserName"></div>
+          <div class="dash-user-batch" id="dashUserBatch"></div>
+        </div>
+        <div class="avatar" id="dashAvatar"></div>
+        <button class="logout-btn" id="logoutBtn">Sign Out</button>
+      </div>
+    </nav>
+
+    <div class="dash-content">
+
+      <!-- Header -->
+      <div class="dash-header">
+        <h1 id="dashGreeting">Good morning</h1>
+        <p id="dashDate"></p>
+      </div>
+
+      <!-- Date Picker -->
+      <div class="date-picker">
+        <label for="bookingDate">Booking Date</label>
+        <input type="date" id="bookingDate" />
+      </div>
+
+      <!-- Info Cards -->
+      <div class="info-cards" id="infoCards">
+        <div class="info-card">
+          <div class="card-label">Total Seats</div>
+          <div class="card-value blue" id="cardTotal">50</div>
+        </div>
+        <div class="info-card">
+          <div class="card-label">Available</div>
+          <div class="card-value green" id="cardAvailable">–</div>
+        </div>
+        <div class="info-card">
+          <div class="card-label">Booked</div>
+          <div class="card-value red" id="cardBooked">–</div>
+        </div>
+        <div class="info-card">
+          <div class="card-label">Your Batch</div>
+          <div class="card-value orange" id="cardBatch">–</div>
+        </div>
+      </div>
+
+      <!-- Booking Banner -->
+      <div class="booking-banner no-booking" id="bookingBanner">
+        <span id="bannerText">You have not booked a seat today.</span>
+      </div>
+
+      <!-- Stats Pills -->
+      <div class="stats-pills" id="statsPills">
+        <div class="stat-pill"><span class="dot available"></span> <span id="pillAvail">0</span> Available</div>
+        <div class="stat-pill"><span class="dot booked"></span> <span id="pillBooked">0</span> Booked</div>
+        <div class="stat-pill"><span class="dot floater"></span> <span id="pillFloater">0</span> Floater</div>
+      </div>
+
+      <!-- Weekend Block (hidden by default) -->
+      <div class="weekend-block" id="weekendBlock" style="display:none;">
+        <div class="weekend-icon">🏖️</div>
+        <h2>It's the Weekend!</h2>
+        <p>Bookings are available Monday through Friday. Enjoy your time off!</p>
+      </div>
+
+      <!-- Seat Sections -->
+      <div id="seatSections">
+        <!-- Regular Seats -->
+        <div class="seat-section">
+          <div class="seat-section-title">Regular Seats (R01 – R40)</div>
+          <div class="seat-grid" id="gridRegular"></div>
+        </div>
+
+        <!-- Floater Seats -->
+        <div class="seat-section">
+          <div class="seat-section-title">Floater Seats (F01 – F10)</div>
+          <div class="seat-grid" id="gridFloater"></div>
+        </div>
+      </div>
+
+      <!-- Legend -->
+      <div class="legend">
+        <div class="legend-item"><span class="swatch s-available"></span> Available</div>
+        <div class="legend-item"><span class="swatch s-booked"></span> Booked</div>
+        <div class="legend-item"><span class="swatch s-mine"></span> My Seat</div>
+        <div class="legend-item"><span class="swatch s-floater"></span> Temp Floater</div>
+      </div>
+
+      <!-- Activity Log -->
+      <div class="activity-section">
+        <div class="seat-section-title">Recent Activity</div>
+        <ul class="activity-list" id="activityList"></ul>
+      </div>
+
+    </div>
+  </div>
+
+  <!-- ═══════════ JS MODULES ═══════════ -->
+  <script src="js/animations.js"></script>
+  <script src="js/auth.js"></script>
+  <script src="js/dashboard.js"></script>
+  <script src="js/app.js"></script>
+</body>
+</html>
